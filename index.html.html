@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coffee Finds</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #f7f2eb;
+    --warm-white: #fdfaf6;
+    --tan: #e8ddd0;
+    --brown: #7a5c44;
+    --dark: #2e2218;
+    --mid: #a08060;
+    --accent: #c4956a;
+  }
+
+  body {
+    background: var(--warm-white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--dark);
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .container { max-width: 680px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* Header */
+  header { text-align: center; margin-bottom: 52px; animation: fadeUp 0.8s ease both; }
+  .eyebrow { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(42px, 8vw, 64px); font-weight: 300; line-height: 1; color: var(--dark); }
+  h1 em { font-style: italic; color: var(--brown); }
+  .subtitle { margin-top: 14px; font-size: 13px; color: var(--mid); letter-spacing: 0.04em; }
+
+  .art-row { display: flex; align-items: flex-end; justify-content: center; margin-bottom: 8px; }
+  .art-cup { width: 90px; height: 80px; flex-shrink: 0; animation: floatCup 4s ease-in-out infinite; }
+  @keyframes floatCup { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+  .art-sprig { width: 70px; height: 55px; opacity: 0.8; }
+  .art-sprig.left { transform: scaleX(-1) translateY(6px); }
+  .art-sprig.right { transform: translateY(6px); }
+  .art-divider-wrap { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 14px auto 0; width: 260px; }
+  .art-divider-line { flex: 1; height: 1px; background: var(--tan); }
+  .art-bean { width: 18px; height: 13px; flex-shrink: 0; }
+
+  /* Form */
+  .add-form { background: var(--cream); border: 1px solid var(--tan); border-radius: 16px; padding: 28px; margin-bottom: 36px; animation: fadeUp 0.8s 0.1s ease both; }
+  .form-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; color: var(--brown); margin-bottom: 20px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-grid .full { grid-column: 1 / -1; }
+
+  input, textarea {
+    width: 100%; background: var(--warm-white); border: 1px solid var(--tan); border-radius: 10px;
+    padding: 11px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300;
+    color: var(--dark); outline: none; transition: border-color 0.2s;
+  }
+  input::placeholder, textarea::placeholder { color: var(--mid); opacity: 0.7; }
+  input:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: none; height: 72px; }
+
+  .field-label { font-size: 12px; color: var(--mid); margin-bottom: 8px; display: block; }
+  .rating-group { display: flex; flex-direction: column; gap: 10px; }
+  .rating-row { display: flex; align-items: center; justify-content: space-between; }
+  .rating-row-label { font-size: 12px; color: var(--mid); display: flex; align-items: center; gap: 5px; }
+  .weight-badge { font-size: 10px; background: var(--accent); color: #fff; padding: 1px 6px; border-radius: 99px; letter-spacing: 0.04em; }
+
+  .stars { display: flex; gap: 2px; }
+  .star-wrap { width: 26px; height: 26px; cursor: pointer; user-select: none; }
+  .star-wrap svg { width: 26px; height: 26px; transition: transform 0.1s; }
+  .star-wrap:hover svg { transform: scale(1.15); }
+  .star-bg { fill: var(--tan); }
+  .star-fill { fill: var(--accent); }
+
+  .vibe-options { display: flex; gap: 8px; flex-wrap: wrap; }
+  .vibe-chip { padding: 6px 14px; border-radius: 99px; border: 1px solid var(--tan); background: var(--warm-white); font-size: 12px; color: var(--mid); cursor: pointer; transition: all 0.15s; user-select: none; }
+  .vibe-chip.selected { background: var(--brown); border-color: var(--brown); color: #fff; }
+
+  .author-toggle { display: flex; gap: 8px; }
+  .author-btn { flex: 1; padding: 9px; border-radius: 10px; border: 1px solid var(--tan); background: var(--warm-white); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300; color: var(--mid); cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em; }
+  .author-btn.selected { background: var(--dark); border-color: var(--dark); color: var(--cream); }
+
+  .add-btn { width: 100%; margin-top: 16px; padding: 13px; background: var(--dark); color: var(--cream); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+  .add-btn:hover { background: var(--brown); transform: translateY(-1px); }
+  .add-btn:active { transform: translateY(0); }
+  .add-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+  /* List */
+  .list-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; animation: fadeUp 0.8s 0.2s ease both; }
+  .list-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; color: var(--dark); }
+  .count { font-size: 12px; color: var(--mid); letter-spacing: 0.05em; }
+  .cards { display: flex; flex-direction: column; gap: 16px; }
+
+  /* Card */
+  .card { background: var(--cream); border: 1px solid var(--tan); border-radius: 16px; overflow: hidden; animation: fadeUp 0.5s ease both; position: relative; }
+  .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); border-radius: 3px 0 0 3px; opacity: 0; transition: opacity 0.2s; }
+  .card:hover::before { opacity: 1; }
+
+  .card-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px 14px; border-bottom: 1px solid var(--tan); }
+  .card-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; color: var(--dark); }
+  .delete-btn { background: none; border: none; cursor: pointer; color: var(--tan); font-size: 15px; padding: 2px 0 2px 8px; transition: color 0.15s; flex-shrink: 0; }
+  .delete-btn:hover { color: var(--accent); }
+
+  /* Side-by-side reviews */
+  .reviews-row { display: grid; grid-template-columns: 1fr 1fr; min-height: 120px; }
+  .review-col { padding: 16px 18px 18px; }
+  .review-col:first-child { border-right: 1px solid var(--tan); }
+
+  .review-author-name { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .review-drink { font-size: 12px; color: var(--mid); margin-bottom: 8px; }
+  .review-score { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; color: var(--brown); line-height: 1; }
+  .review-score-label { font-size: 10px; color: var(--mid); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .review-sub-scores { display: grid; grid-template-columns: 64px 1fr; gap: 3px 6px; align-items: center; margin: 6px 0; }
+  .review-sub-label { font-size: 10px; color: var(--mid); letter-spacing: 0.04em; }
+  .review-sub-stars { display: flex; gap: 1px; }
+
+  .review-note { font-size: 12px; color: var(--mid); line-height: 1.5; margin-top: 6px; }
+  .review-vibe { display: inline-block; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--brown); background: var(--tan); padding: 2px 9px; border-radius: 99px; margin-top: 8px; }
+
+  .review-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 120px; gap: 10px; padding: 16px; }
+  .review-empty-name { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tan); }
+  .add-review-btn { padding: 7px 16px; border-radius: 99px; border: 1px dashed var(--tan); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--mid); cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em; }
+  .add-review-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Inline form */
+  .inline-form { border-top: 1px solid var(--tan); padding: 18px 22px 20px; animation: fadeUp 0.3s ease both; }
+  .inline-form-title { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-style: italic; color: var(--brown); margin-bottom: 14px; }
+  .inline-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .inline-form-grid .full { grid-column: 1 / -1; }
+
+  .inline-save-btn { margin-top: 12px; padding: 10px 24px; background: var(--dark); color: var(--cream); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+  .inline-save-btn:hover { background: var(--brown); }
+  .inline-save-btn:disabled { opacity: 0.5; cursor: default; }
+  .inline-cancel-btn { margin-top: 12px; margin-left: 10px; padding: 10px 16px; background: transparent; color: var(--mid); border: 1px solid var(--tan); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .inline-cancel-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .empty-state { text-align: center; padding: 48px 24px; color: var(--mid); animation: fadeUp 0.6s ease both; }
+  .empty-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.5; }
+  .empty-state p { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="art-row">
+      <svg class="art-sprig left" viewBox="0 0 80 60" fill="none">
+        <line x1="40" y1="55" x2="40" y2="10" stroke="#c4956a" stroke-width="1.2"/>
+        <ellipse cx="40" cy="10" rx="7" ry="4" fill="#e8ddd0" stroke="#c4956a" stroke-width="1"/>
+        <ellipse cx="28" cy="22" rx="9" ry="5" fill="#e8ddd0" stroke="#c4956a" stroke-width="1" transform="rotate(-30 28 22)"/>
+        <ellipse cx="52" cy="30" rx="9" ry="5" fill="#e8ddd0" stroke="#c4956a" stroke-width="1" transform="rotate(30 52 30)"/>
+        <ellipse cx="30" cy="40" rx="8" ry="4.5" fill="#e8ddd0" stroke="#c4956a" stroke-width="1" transform="rotate(-20 30 40)"/>
+        <circle cx="40" cy="10" r="2" fill="#c4956a"/>
+        <circle cx="24" cy="20" r="1.5" fill="#c4956a"/>
+        <circle cx="53" cy="28" r="1.5" fill="#c4956a"/>
+      </svg>
+      <svg class="art-cup" viewBox="0 0 90 80" fill="none">
+        <path d="M32 22 Q28 14 32 8 Q36 2 32 -4" stroke="#c4956a" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.5"/>
+        <path d="M45 20 Q41 12 45 6 Q49 0 45 -6" stroke="#c4956a" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.4"/>
+        <path d="M58 22 Q54 14 58 8 Q62 2 58 -4" stroke="#c4956a" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.5"/>
+        <path d="M18 28 L24 68 Q45 74 66 68 L72 28 Z" fill="#f7f2eb" stroke="#c4956a" stroke-width="1.5"/>
+        <ellipse cx="45" cy="68" rx="30" ry="5" fill="#e8ddd0" stroke="#c4956a" stroke-width="1.2"/>
+        <path d="M70 36 Q84 40 80 52 Q78 60 70 58" stroke="#c4956a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="45" cy="30" rx="26" ry="5" fill="#c4956a" opacity="0.25"/>
+        <path d="M39 30 Q42 27 45 30 Q48 27 51 30 Q51 35 45 39 Q39 35 39 30Z" fill="#c4956a" opacity="0.35"/>
+      </svg>
+      <svg class="art-sprig right" viewBox="0 0 80 60" fill="none">
+        <line x1="40" y1="55" x2="40" y2="10" stroke="#c4956a" stroke-width="1.2"/>
+        <ellipse cx="40" cy="10" rx="7" ry="4" fill="#e8ddd0" stroke="#c4956a" stroke-width="1"/>
+        <ellipse cx="52" cy="22" rx="9" ry="5" fill="#e8ddd0" stroke="#c4956a" stroke-width="1" transform="rotate(30 52 22)"/>
+        <ellipse cx="28" cy="30" rx="9" ry="5" fill="#e8ddd0" stroke="#c4956a" stroke-width="1" transform="rotate(-30 28 30)"/>
+        <ellipse cx="50" cy="40" rx="8" ry="4.5" fill="#e8ddd0" stroke="#c4956a" stroke-width="1" transform="rotate(20 50 40)"/>
+        <circle cx="40" cy="10" r="2" fill="#c4956a"/>
+        <circle cx="56" cy="20" r="1.5" fill="#c4956a"/>
+        <circle cx="27" cy="28" r="1.5" fill="#c4956a"/>
+      </svg>
+    </div>
+    <p class="eyebrow">my little guide</p>
+    <h1>Coffee <em>Finds</em></h1>
+    <p class="subtitle">the good spots, ranked honestly</p>
+    <div class="art-divider-wrap">
+      <div class="art-divider-line"></div>
+      <svg class="art-bean" viewBox="0 0 20 14" fill="none"><ellipse cx="10" cy="7" rx="9" ry="6" fill="#e8ddd0" stroke="#c4956a" stroke-width="1"/><path d="M10 1 Q6 7 10 13" stroke="#c4956a" stroke-width="1" stroke-linecap="round" fill="none"/></svg>
+      <svg class="art-bean" viewBox="0 0 20 14" fill="none"><ellipse cx="10" cy="7" rx="9" ry="6" fill="#e8ddd0" stroke="#c4956a" stroke-width="1"/><path d="M10 1 Q14 7 10 13" stroke="#c4956a" stroke-width="1" stroke-linecap="round" fill="none"/></svg>
+      <svg class="art-bean" viewBox="0 0 20 14" fill="none"><ellipse cx="10" cy="7" rx="9" ry="6" fill="#e8ddd0" stroke="#c4956a" stroke-width="1"/><path d="M10 1 Q6 7 10 13" stroke="#c4956a" stroke-width="1" stroke-linecap="round" fill="none"/></svg>
+      <div class="art-divider-line"></div>
+    </div>
+  </header>
+
+  <div class="add-form">
+    <p class="form-title">+ add a new spot</p>
+    <div class="form-grid">
+      <input class="full" id="shopName" type="text" placeholder="Coffee shop name">
+      <input class="full" id="drinkInput" type="text" placeholder="Favorite drink">
+      <div class="full rating-group">
+        <div class="rating-row">
+          <span class="rating-row-label">coffee quality <span class="weight-badge">2×</span></span>
+          <div class="stars" id="starCoffee"></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-row-label">atmosphere</span>
+          <div class="stars" id="starAtmo"></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-row-label">value</span>
+          <div class="stars" id="starValue"></div>
+        </div>
+      </div>
+      <div class="full">
+        <span class="field-label">vibe</span>
+        <div class="vibe-options" id="vibePicker">
+          <div class="vibe-chip" data-vibe="quick coffee">quick coffee</div>
+          <div class="vibe-chip" data-vibe="sunday morning">sunday morning</div>
+          <div class="vibe-chip" data-vibe="group hangout">group hangout</div>
+          <div class="vibe-chip" data-vibe="date spot">date spot</div>
+          <div class="vibe-chip" data-vibe="work session">work session</div>
+          <div class="vibe-chip" data-vibe="catch-up">catch-up</div>
+          <div class="vibe-chip" data-vibe="treat yourself">treat yourself</div>
+        </div>
+      </div>
+      <textarea class="full" id="noteInput" placeholder="Any notes? (parking, must-try...)"></textarea>
+      <div class="full">
+        <span class="field-label">added by</span>
+        <div class="author-toggle">
+          <button class="author-btn" id="authorLuke" onclick="selectAuthor('Luke')">Luke</button>
+          <button class="author-btn" id="authorAliyah" onclick="selectAuthor('Aliyah')">Aliyah</button>
+        </div>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addShop()">Save this spot</button>
+  </div>
+
+  <div class="list-header">
+    <span class="list-title">
+      <svg width="16" height="16" viewBox="0 0 20 14" fill="none" style="vertical-align:middle;margin-right:6px;opacity:0.6">
+        <ellipse cx="10" cy="7" rx="9" ry="6" fill="#e8ddd0" stroke="#c4956a" stroke-width="1.2"/>
+        <path d="M10 1 Q6 7 10 13" stroke="#c4956a" stroke-width="1" stroke-linecap="round" fill="none"/>
+      </svg>my spots
+    </span>
+    <span class="count" id="countLabel">0 places</span>
+  </div>
+
+  <div class="cards" id="cardList"></div>
+
+</div>
+<script>
+  const SUPABASE_URL = 'https://ubinrdebjjhshtzmzahf.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViaW5yZGViampoc2h0em16YWhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMDI3NTgsImV4cCI6MjA4ODU3ODc1OH0.GMxdI1W-cdFm8Y6zgz_UK0VkpNqMtj0W-GBTRVMjcl8';
+  const AUTHORS = ['Luke', 'Aliyah'];
+  const SP = "M12 2l2.9 6 6.6.9-4.8 4.6 1.1 6.5L12 17l-5.8 3 1.1-6.5L2.5 9 9.1 8z";
+
+  async function dbGet(q) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/coffee_shops${q}`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+    return r.json();
+  }
+  async function dbInsert(row) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/coffee_shops`, { method:'POST', headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=representation'}, body: JSON.stringify([row]) });
+    const d = await r.json(); return d[0];
+  }
+  async function dbDelete(id) {
+    await fetch(`${SUPABASE_URL}/rest/v1/coffee_shops?id=eq.${id}`, { method:'DELETE', headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`} });
+  }
+
+  let rows = [];
+  let scores = { coffee:0, atmo:0, value:0 };
+  let selectedVibe = '', selectedAuthor = '';
+  let openForms = {};
+
+  // Stars
+  function starSVG(fill) {
+    const uid = Math.random().toString(36).slice(2);
+    if (fill===1) return `<svg viewBox="0 0 24 24"><path class="star-fill" d="${SP}"/></svg>`;
+    if (fill===0.5) return `<svg viewBox="0 0 24 24"><defs><clipPath id="h${uid}"><rect x="0" y="0" width="12" height="24"/></clipPath></defs><path class="star-bg" d="${SP}"/><path class="star-fill" d="${SP}" clip-path="url(#h${uid})"/></svg>`;
+    return `<svg viewBox="0 0 24 24"><path class="star-bg" d="${SP}"/></svg>`;
+  }
+
+  function miniStars(n) {
+    return Array.from({length:5},(_,i)=>{
+      const s=i+1, uid=`m${i}${Math.random().toString(36).slice(2,5)}`;
+      const fill=n>=s?1:n>=s-0.5?0.5:0;
+      if(fill===1) return `<svg width="12" height="12" viewBox="0 0 24 24"><path fill="var(--accent)" d="${SP}"/></svg>`;
+      if(fill===0.5) return `<svg width="12" height="12" viewBox="0 0 24 24"><defs><clipPath id="${uid}"><rect x="0" y="0" width="12" height="24"/></clipPath></defs><path fill="var(--tan)" d="${SP}"/><path fill="var(--accent)" d="${SP}" clip-path="url(#${uid})"/></svg>`;
+      return `<svg width="12" height="12" viewBox="0 0 24 24"><path fill="var(--tan)" d="${SP}"/></svg>`;
+    }).join('');
+  }
+
+  function buildStarPicker(containerId, scoreObj, key) {
+    const el = document.getElementById(containerId); if(!el) return;
+    el.innerHTML = '';
+    for(let i=1;i<=5;i++){
+      const w = document.createElement('div'); w.className='star-wrap'; w.innerHTML=starSVG(0);
+      w.addEventListener('click', e=>{ const x=e.clientX-w.getBoundingClientRect().left; scoreObj[key]=x<w.offsetWidth/2?i-0.5:i; updatePickerEl(el,scoreObj[key]); });
+      w.addEventListener('mousemove', e=>{ const x=e.clientX-w.getBoundingClientRect().left; updatePickerEl(el,x<w.offsetWidth/2?i-0.5:i); });
+      el.appendChild(w);
+    }
+    el.addEventListener('mouseleave',()=>updatePickerEl(el,scoreObj[key]));
+  }
+
+  function updatePickerEl(el, val) {
+    el.querySelectorAll('.star-wrap').forEach((w,i)=>{ const s=i+1; w.innerHTML=starSVG(val>=s?1:val>=s-0.5?0.5:0); });
+  }
+
+  function selectAuthor(name) {
+    selectedAuthor = name;
+    document.getElementById('authorLuke').classList.toggle('selected', name==='Luke');
+    document.getElementById('authorAliyah').classList.toggle('selected', name==='Aliyah');
+  }
+
+  document.querySelectorAll('#vibePicker .vibe-chip').forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      document.querySelectorAll('#vibePicker .vibe-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected'); selectedVibe=chip.dataset.vibe;
+    });
+  });
+
+  function calcScore(r) {
+    if(!r.coffee&&!r.atmo&&!r.value) return null;
+    const w=(r.coffee?2:0)+(r.atmo?1:0)+(r.value?1:0);
+    return ((r.coffee*2+r.atmo+r.value)/w).toFixed(1);
+  }
+
+  function groupByShop(rows) {
+    const map={}, order=[];
+    for(const row of rows){
+      const k=row.shop_name;
+      if(!map[k]){map[k]={};order.push(k);}
+      map[k][row.author]=row;
+    }
+    return order.map(k=>({shopName:k, reviews:map[k]}));
+  }
+
+  function esc(s){ return s.replace(/[^a-zA-Z0-9]/g,'_'); }
+
+  async function addShop() {
+    const name=document.getElementById('shopName').value.trim();
+    if(!name){document.getElementById('shopName').focus();return;}
+    if(!selectedAuthor){alert('Please select who is adding this.');return;}
+    const btn=document.querySelector('.add-btn');
+    btn.textContent='saving...'; btn.disabled=true;
+    try {
+      const row = await dbInsert({ shop_name:name, drink:document.getElementById('drinkInput').value.trim()||null, coffee:scores.coffee||null, atmo:scores.atmo||null, value:scores.value||null, vibe:selectedVibe||null, note:document.getElementById('noteInput').value.trim()||null, author:selectedAuthor });
+      rows.unshift(row); resetForm(); render();
+    } catch(e){ alert('Could not save. Check your connection.'); }
+    btn.textContent='save this spot'; btn.disabled=false;
+  }
+
+  function resetForm(){
+    ['shopName','drinkInput','noteInput'].forEach(id=>document.getElementById(id).value='');
+    scores={coffee:0,atmo:0,value:0}; selectedVibe=''; selectedAuthor='';
+    ['starCoffee','starAtmo','starValue'].forEach(id=>{ const el=document.getElementById(id); if(el) updatePickerEl(el,0); });
+    document.querySelectorAll('#vibePicker .vibe-chip').forEach(c=>c.classList.remove('selected'));
+    document.querySelectorAll('.author-btn').forEach(b=>b.classList.remove('selected'));
+  }
+
+  async function deleteShop(shopName){
+    const toDelete=rows.filter(r=>r.shop_name===shopName);
+    await Promise.all(toDelete.map(r=>dbDelete(r.id)));
+    rows=rows.filter(r=>r.shop_name!==shopName);
+    delete openForms[shopName]; render();
+  }
+
+  function showInlineForm(shopName, author){
+    openForms[shopName]={scores:{coffee:0,atmo:0,value:0}, vibe:'', author};
+    render();
+  }
+
+  function cancelInlineForm(shopName){ delete openForms[shopName]; render(); }
+
+  async function saveInlineReview(shopName){
+    const state=openForms[shopName];
+    const id=esc(shopName);
+    const btn=document.getElementById(`il-save-${id}`); btn.textContent='saving...'; btn.disabled=true;
+    try {
+      const row=await dbInsert({ shop_name:shopName, drink:document.getElementById(`il-drink-${id}`)?.value.trim()||null, coffee:state.scores.coffee||null, atmo:state.scores.atmo||null, value:state.scores.value||null, vibe:state.vibe||null, note:document.getElementById(`il-note-${id}`)?.value.trim()||null, author:state.author });
+      rows.push(row); delete openForms[shopName]; render();
+    } catch(e){ alert('Could not save. Try again.'); btn.textContent='save'; btn.disabled=false; }
+  }
+
+  function wireInlineForm(shopName){
+    const id=esc(shopName); const state=openForms[shopName]; if(!state) return;
+    buildStarPicker(`il-coffee-${id}`, state.scores, 'coffee');
+    buildStarPicker(`il-atmo-${id}`, state.scores, 'atmo');
+    buildStarPicker(`il-value-${id}`, state.scores, 'value');
+    document.querySelectorAll(`#il-vibe-${id} .vibe-chip`).forEach(chip=>{
+      chip.addEventListener('click',()=>{
+        document.querySelectorAll(`#il-vibe-${id} .vibe-chip`).forEach(c=>c.classList.remove('selected'));
+        chip.classList.add('selected'); state.vibe=chip.dataset.vibe;
+      });
+    });
+  }
+
+  function reviewColHTML(r){
+    const score=calcScore(r);
+    return `<div class="review-col">
+      <div class="review-author-name">${r.author}</div>
+      ${r.drink?`<div class="review-drink">✦ ${r.drink}</div>`:''}
+      ${score?`<div class="review-score">${score}</div><div class="review-score-label">score</div>`:''}
+      ${(r.coffee||r.atmo||r.value)?`<div class="review-sub-scores">
+        ${r.coffee?`<span class="review-sub-label">coffee</span><span class="review-sub-stars">${miniStars(r.coffee)}</span>`:''}
+        ${r.atmo?`<span class="review-sub-label">atmosphere</span><span class="review-sub-stars">${miniStars(r.atmo)}</span>`:''}
+        ${r.value?`<span class="review-sub-label">value</span><span class="review-sub-stars">${miniStars(r.value)}</span>`:''}
+      </div>`:''}
+      ${r.note?`<div class="review-note">${r.note}</div>`:''}
+      ${r.vibe?`<div class="review-vibe">${r.vibe}</div>`:''}
+    </div>`;
+  }
+
+  function render(){
+    const list=document.getElementById('cardList');
+    const groups=groupByShop(rows);
+    document.getElementById('countLabel').textContent=`${groups.length} place${groups.length!==1?'s':''}`;
+
+    if(!groups.length){ list.innerHTML=`<div class="empty-state"><div class="empty-icon">☕</div><p>no spots yet — add your first find</p></div>`; return; }
+
+    groups.sort((a,b)=>{
+      const avg=g=>{const v=Object.values(g.reviews).map(calcScore).filter(Boolean).map(Number); return v.length?v.reduce((s,x)=>s+x,0)/v.length:0;};
+      return avg(b)-avg(a);
+    });
+
+    list.innerHTML=groups.map((group,gi)=>{
+      const{shopName,reviews}=group;
+      const id=esc(shopName);
+      const sn=shopName.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const inlineState=openForms[shopName];
+
+      const cols=AUTHORS.map(author=>{
+        const r=reviews[author];
+        if(r) return reviewColHTML(r);
+        if(inlineState&&inlineState.author===author) return `<div class="review-col"><div class="review-author-name">${author}</div></div>`;
+        return `<div class="review-empty"><div class="review-empty-name">${author}</div><button class="add-review-btn" onclick="showInlineForm('${sn}','${author}')">+ add my rating</button></div>`;
+      }).join('');
+
+      const inlineForm=inlineState?`<div class="inline-form">
+        <div class="inline-form-title">${inlineState.author}'s review</div>
+        <div class="inline-form-grid">
+          <input class="full" id="il-drink-${id}" type="text" placeholder="Favorite drink">
+          <div class="full rating-group">
+            <div class="rating-row"><span class="rating-row-label">coffee quality <span class="weight-badge">2×</span></span><div class="stars" id="il-coffee-${id}"></div></div>
+            <div class="rating-row"><span class="rating-row-label">atmosphere</span><div class="stars" id="il-atmo-${id}"></div></div>
+            <div class="rating-row"><span class="rating-row-label">value</span><div class="stars" id="il-value-${id}"></div></div>
+          </div>
+          <div class="full">
+            <span class="field-label">vibe</span>
+            <div class="vibe-options" id="il-vibe-${id}">
+              <div class="vibe-chip" data-vibe="quick coffee">quick coffee</div>
+              <div class="vibe-chip" data-vibe="sunday morning">sunday morning</div>
+              <div class="vibe-chip" data-vibe="group hangout">group hangout</div>
+              <div class="vibe-chip" data-vibe="date spot">date spot</div>
+              <div class="vibe-chip" data-vibe="work session">work session</div>
+              <div class="vibe-chip" data-vibe="catch-up">catch-up</div>
+              <div class="vibe-chip" data-vibe="treat yourself">treat yourself</div>
+            </div>
+          </div>
+          <textarea class="full" id="il-note-${id}" placeholder="Any notes?"></textarea>
+        </div>
+        <button class="inline-save-btn" id="il-save-${id}" onclick="saveInlineReview('${sn}')">save</button>
+        <button class="inline-cancel-btn" onclick="cancelInlineForm('${sn}')">cancel</button>
+      </div>`:'';
+
+      return `<div class="card" style="animation-delay:${gi*0.05}s">
+        <div class="card-header">
+          <div class="card-name">${shopName}</div>
+          <button class="delete-btn" onclick="deleteShop('${sn}')">✕</button>
+        </div>
+        <div class="reviews-row">${cols}</div>
+        ${inlineForm}
+      </div>`;
+    }).join('');
+
+    // Wire inline star pickers after DOM update
+    Object.keys(openForms).forEach(wireInlineForm);
+  }
+
+  async function load(){
+    document.getElementById('cardList').innerHTML=`<div class="empty-state"><div class="empty-icon" style="font-size:20px;opacity:0.3">—</div><p>loading...</p></div>`;
+    try{ rows=await dbGet('?order=created_at.desc'); render(); }
+    catch(e){ document.getElementById('cardList').innerHTML=`<div class="empty-state"><p>couldn't connect. check your internet and refresh.</p></div>`; }
+  }
+
+  buildStarPicker('starCoffee', scores, 'coffee');
+  buildStarPicker('starAtmo', scores, 'atmo');
+  buildStarPicker('starValue', scores, 'value');
+  load();
+</script>
+</body>
+</html>
